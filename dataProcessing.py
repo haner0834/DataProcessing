@@ -1,11 +1,18 @@
 import subprocess
 import re
 
-def get_first_note_on_Notes() -> str:
+def get_note(name: str) -> str:
     # use AppleScript to get note
-    applescript = '''
+    applescript = f'''
     tell application "Notes"
-        set allNotes to body of note 1
+        set targetName to "{name}"
+        repeat with aNote in notes
+            if name of aNote is targetName then
+                set noteContent to body of aNote
+                return noteContent
+                exit repeat
+            end if
+        end repeat
     end tell
     '''
 
@@ -16,9 +23,7 @@ def get_first_note_on_Notes() -> str:
 # bcuz Apple Notes tag content as html form
 def remove_html_tags(text: str) -> str:
     html_tags = ['<div>', '<br>', '</div>', '<h1>', '</h1>', 'amp']
-    title_keys = ['Her Birthday Greeting']
-    tags = html_tags + title_keys
-    for tag in tags:
+    for tag in html_tags:
         text = re.sub(re.escape(tag), '', text)
 
     return text
@@ -82,7 +87,6 @@ class Greeting:
         return text
     
 '''
-
 rule of tagging greeting:
 GREETING                                            => when there's nothing to tag
 or
@@ -111,25 +115,27 @@ or
 CardContentItem(text: "IMAGE_DETAIL", Image: "IMAGE_NAME", isShowButton: bool),     => when there's image and isShowButton in
 '''    
 
-result: str = get_first_note_on_Notes()
+note: str = get_note('Her Birthday Greeting')
 
-bd_greetings: str = remove_html_tags(result).splitlines()
+bd_greetings: list[str] = remove_html_tags(note).splitlines()
+
+bd_greetings.pop(0)# remove note title
 
 for text in bd_greetings:
-    greeting = Greeting(text)
+    greeting: Greeting = Greeting(text)
 
     contains_image = greeting.contains_image()
     contains_isShowButton = greeting.contains_isShowButton()
 
     # image
     image_name = greeting.get_image_name()
-    image_text = f'", image: Image("{ image_name }")' if contains_image else '"'
+    image_text = f'", image: Image("{image_name}")' if contains_image else '"'
 
     # greeting content
     greeting_content = greeting.remove_tags(image_name if contains_image else '')
 
     # isShowButton(Bool)
     isShowButton = 'true' if greeting.get_isShowButton() else 'false'
-    isShowButton_text = f', isShowButton: { isShowButton }' if contains_isShowButton else ''
+    isShowButton_text = f', isShowButton: {isShowButton}' if contains_isShowButton else ''
 
     print('CardContentItem(text: "', greeting_content, image_text, isShowButton_text, '),', sep = '')
