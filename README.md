@@ -14,6 +14,6 @@ struct CardContentItem: Identifiable {
     }
 }
 ```
-in my project, this structure will be in an array, which means I need to add "," to split each item  
-and I added some image to Xcode, so the input of image name(Image  `IMAGE_NAME`)is the name of image  
-after running this, I'll copy the output and paste into my Swift project
+in my project, this structure will be used in an array, which means I need to add "," to split each item  
+and I added some image to Xcode, so the input of image name(`Image  IMAGE_NAME`)is the name of image  
+after running this, I'll copy the output(print out) and paste into my Swift project
