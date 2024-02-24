@@ -1,11 +1,15 @@
 import subprocess
 import re
+from typing import Literal
 
-def get_note(name: str) -> str:
+NoteTitle = Literal['Her Birthday Greeting', 'Her Birthday Greeting-After Visit 10 Times', 'CardNonsense']
+# just like a enumeration, create some object to limit string
+
+def get_note(title: NoteTitle) -> str:
     # use AppleScript to get note
     applescript = f'''
     tell application "Notes"
-        set targetName to "{name}"
+        set targetName to "{title}"
         repeat with aNote in notes
             if name of aNote is targetName then
                 set noteContent to body of aNote
@@ -21,7 +25,7 @@ def get_note(name: str) -> str:
     return result.stdout
 
 # bcuz Apple Notes tag content as html form
-def remove_html_tags(text: str) -> str:
+def remove_html_tags(text: str, /) -> str:
     html_tags = ['<div>', '<br>', '</div>', '<h1>', '</h1>', 'amp']
     for tag in html_tags:
         text = re.sub(re.escape(tag), '', text)
@@ -33,6 +37,7 @@ class Greeting:
         self.content = greeting
         # immutable!!!!!
 
+    # image
     def get_image_name(self) -> str:
         tags = ['Image  ', self.get_marked_detail(), self.get_marked_boolean()]
         return_value = self.content
@@ -41,9 +46,11 @@ class Greeting:
 
         return return_value
     
+    @property
     def contains_image(self) -> bool:
         return self.content.__contains__('Image  ')
     
+    # image detail(or content of greeting)
     def get_image_detail(self) -> str:
         detail = ''
         is_detail = False
@@ -59,6 +66,11 @@ class Greeting:
     def get_marked_detail(self) -> str:
         return f'[{self.get_image_detail()}]'
     
+    # isShowButton
+    @property
+    def contains_isShowButton(self) -> bool:
+        return self.content.__contains__('{') or self.content.__contains__('}')
+
     def get_isShowButton(self) -> bool:
         isShowButton: bool = False
         is_bool: bool = False
@@ -71,14 +83,12 @@ class Greeting:
 
         return False
     
-    def contains_isShowButton(self) -> bool:
-        return self.content.__contains__('{') or self.content.__contains__('}')
-    
     def get_marked_boolean(self) -> str:
         jjj = 'true' if self.get_isShowButton() else 'false'
         return '{' + jjj + '}'
     
-    def remove_tags(self, image_name: str) -> str:
+    # processing remove tags(it return content of greeting, bcuz it remove all the tag of text, leave only content)
+    def remove_tags(self, image_name: str = '', /) -> str:
         tags = ['Image  ', '[', ']', '{', '}', 'true', 'false', image_name]
         text = self.content
         for tag in tags:
@@ -124,8 +134,8 @@ bd_greetings.pop(0)# remove note title
 for text in bd_greetings:
     greeting: Greeting = Greeting(text)
 
-    contains_image = greeting.contains_image()
-    contains_isShowButton = greeting.contains_isShowButton()
+    contains_image = greeting.contains_image
+    contains_isShowButton = greeting.contains_isShowButton
 
     # image
     image_name = greeting.get_image_name()
