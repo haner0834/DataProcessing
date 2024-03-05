@@ -1,5 +1,5 @@
-I'm going to process text of note to turn to Swift Language  
-this is Data Structure in my Swift File  
+I'm going to change the text of note to Swift Language  
+This is the Data structure in my Swift file  
 ```swift
 struct CardContentItem: Identifiable {
     let id = UUID()
@@ -14,6 +14,6 @@ struct CardContentItem: Identifiable {
     }
 }
 ```
-in my project, this structure will be used in an array, which means I need to add "," to split each item  
-and I added some image to Xcode, so the input of image name(`Image  IMAGE_NAME`)is the name of image  
-after running this, I'll copy the output(print out) and paste into my Swift project
+In my project, this structure would be used in an array, so I needed to add "," to split each item  
+and I also added some image to Xcode, so the input of image name(`Image  IMAGE_NAME`)would be the name of image  
+after running this, I would copy the output(print out) and paste into my Swift project
